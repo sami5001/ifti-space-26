@@ -4,12 +4,12 @@
         <description><![CDATA[Academic portfolio and blog]]></description>
         <link>https://example.com</link>
         <generator>RSS for Node</generator>
-        <lastBuildDate>Sun, 04 Jan 2026 14:57:02 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 04 Jan 2026 19:05:56 GMT</lastBuildDate>
         <atom:link href="https://example.com/feed.xml" rel="self" type="application/rss+xml"/>
-        <pubDate>Sun, 04 Jan 2026 14:57:02 GMT</pubDate>
+        <pubDate>Sun, 04 Jan 2026 19:05:56 GMT</pubDate>
         <language><![CDATA[en]]></language>
         <item>
-            <title><![CDATA[Getting Started with Your Academic Portfolio]]></title>
+            <title><![CDATA[Welcome to My Research Blog]]></title>
             <link>https://example.com/blog/getting-started</link>
             <guid isPermaLink="true">https://example.com/blog/getting-started</guid>
             <pubDate>Mon, 15 Jan 2024 00:00:00 GMT</pubDate>

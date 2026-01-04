@@ -10,6 +10,7 @@ import { getResearchProjects } from '@lib/research';
 import type { ResearchProject } from '@lib/types';
 import { FileTextIcon, RocketIcon, CheckCircledIcon } from '@radix-ui/react-icons';
 import { siteConfig } from '@config/site';
+import { heroFocalPoints } from '@config/heroFocalPoints';
 
 const PageWrapper = styled('div', {
   minHeight: '100vh',
@@ -142,7 +143,7 @@ export default function ResearchPage({ ongoingProjects, completedProjects }: Res
         title="Research"
         subtitle="Exploring new frontiers of knowledge through rigorous academic inquiry and collaborative scholarship."
         tagline="Academic Research"
-        imagePosition="center"
+        focalPoint={heroFocalPoints['/images/hero/hero-research.jpg']}
         textAlign="left"
       />
 

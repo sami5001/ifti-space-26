@@ -256,6 +256,18 @@ export function MobileMenu({ className }: MobileMenuProps) {
           </NavSection>
 
           <NavSection>
+            <NextLink href="/bio" passHref legacyBehavior>
+              <NavLink onClick={handleLinkClick}>Bio</NavLink>
+            </NextLink>
+            <NextLink href="/cv" passHref legacyBehavior>
+              <NavLink onClick={handleLinkClick}>CV</NavLink>
+            </NextLink>
+            <NextLink href="/press" passHref legacyBehavior>
+              <NavLink onClick={handleLinkClick}>Press</NavLink>
+            </NextLink>
+          </NavSection>
+
+          <NavSection>
             <NextLink href="/blog" passHref legacyBehavior>
               <NavLink onClick={handleLinkClick}>Writing</NavLink>
             </NextLink>

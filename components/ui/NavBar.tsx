@@ -2,6 +2,7 @@
 
 import React from 'react';
 import NextLink from 'next/link';
+import Image from 'next/image';
 import { styled } from 'stitches.config';
 import { ThemeToggle } from './ThemeToggle';
 import { Container } from './Container';
@@ -30,26 +31,39 @@ const NavContent = styled('div', {
   height: '52px',
 
   '@bp2': {
-    height: '56px',
+    height: '64px',
   },
 });
 
 const NavBrand = styled('a', {
-  fontSize: '$4',
-  fontWeight: '$semibold',
-  color: '$foreground',
+  display: 'flex',
+  alignItems: 'center',
   textDecoration: 'none',
-  transition: 'color 0.2s ease',
+  transition: 'opacity 0.2s ease',
 
   '&:hover': {
-    color: '$accent',
+    opacity: 0.8,
+  },
+});
+
+const LogoImage = styled(Image, {
+  height: '28px',
+  width: 'auto',
+  filter: 'invert(1)',
+
+  '.dark &': {
+    filter: 'invert(0)',
+  },
+
+  '@bp2': {
+    height: '32px',
   },
 });
 
 const NavLinks = styled('div', {
   display: 'none',
   alignItems: 'center',
-  gap: '$1',
+  gap: '2px',
   marginLeft: 'auto',
 
   '@bp2': {
@@ -101,34 +115,59 @@ const publicationsDropdownItems = [
 ];
 
 export function NavBar({ showBrand = true }: NavBarProps) {
+  // Use all navigation items from config
+  const navItems = siteConfig.navigation;
+
   return (
     <NavWrapper>
       <Container>
         <NavContent>
           {showBrand ? (
             <NextLink href="/" passHref legacyBehavior>
-              <NavBrand>{siteConfig.name}</NavBrand>
+              <NavBrand>
+                <LogoImage
+                  src="/images/logos/IFTI_space-WHT-txt.svg"
+                  alt={siteConfig.name}
+                  width={120}
+                  height={32}
+                  priority
+                />
+              </NavBrand>
             </NextLink>
           ) : (
             <div />
           )}
 
           <NavLinks>
-            <NextLink href="/" passHref legacyBehavior>
-              <NavLink>Home</NavLink>
-            </NextLink>
-            <Dropdown trigger="Research" href="/research" items={researchDropdownItems} />
-            <Dropdown
-              trigger="Publications"
-              href="/publications"
-              items={publicationsDropdownItems}
-            />
-            <NextLink href="/blog" passHref legacyBehavior>
-              <NavLink>Writing</NavLink>
-            </NextLink>
-            <NextLink href="/contact" passHref legacyBehavior>
-              <NavLink>Contact</NavLink>
-            </NextLink>
+            {navItems.map((item) => {
+              // Handle dropdown menus for Research and Publications
+              if (item.href === '/research') {
+                return (
+                  <Dropdown
+                    key={item.href}
+                    trigger={item.label}
+                    href={item.href}
+                    items={researchDropdownItems}
+                  />
+                );
+              }
+              if (item.href === '/publications') {
+                return (
+                  <Dropdown
+                    key={item.href}
+                    trigger={item.label}
+                    href={item.href}
+                    items={publicationsDropdownItems}
+                  />
+                );
+              }
+              // Regular nav links
+              return (
+                <NextLink key={item.href} href={item.href} passHref legacyBehavior>
+                  <NavLink>{item.label}</NavLink>
+                </NextLink>
+              );
+            })}
           </NavLinks>
 
           <NavActions>

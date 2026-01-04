@@ -2,6 +2,64 @@ import React, { useEffect, useState, useRef } from 'react';
 import Image, { StaticImageData } from 'next/image';
 import { styled, keyframes } from 'stitches.config';
 
+// Focal point types for responsive image positioning
+interface FocalPointValue {
+  x: number; // 0-100 percentage
+  y: number; // 0-100 percentage
+}
+
+interface ResponsiveFocalPoint {
+  /** Default/mobile focal point (< 750px) */
+  default: FocalPointValue;
+  /** Tablet focal point (750px+), optional - falls back to default */
+  bp2?: FocalPointValue;
+  /** Desktop focal point (1000px+), optional - falls back to bp2 or default */
+  bp3?: FocalPointValue;
+}
+
+type FocalPointProp = FocalPointValue | ResponsiveFocalPoint;
+
+// Type guard to check if focalPoint is responsive
+function isResponsiveFocalPoint(fp: FocalPointProp): fp is ResponsiveFocalPoint {
+  return 'default' in fp;
+}
+
+const fallbackFocalPoints: Record<string, FocalPointValue> = {
+  center: { x: 50, y: 50 },
+  left: { x: 0, y: 50 },
+  right: { x: 100, y: 50 },
+  top: { x: 50, y: 0 },
+  bottom: { x: 50, y: 100 },
+};
+
+function getFallbackFocalPoint(imagePosition: string): FocalPointValue {
+  return fallbackFocalPoints[imagePosition] || fallbackFocalPoints.center;
+}
+
+function getActiveFocalPoint(
+  focalPoint: FocalPointProp | undefined,
+  imagePosition: string,
+  viewportWidth: number
+): FocalPointValue {
+  if (!focalPoint) {
+    return getFallbackFocalPoint(imagePosition);
+  }
+
+  if (!isResponsiveFocalPoint(focalPoint)) {
+    return focalPoint;
+  }
+
+  if (viewportWidth >= 1000) {
+    return focalPoint.bp3 || focalPoint.bp2 || focalPoint.default;
+  }
+
+  if (viewportWidth >= 750) {
+    return focalPoint.bp2 || focalPoint.default;
+  }
+
+  return focalPoint.default;
+}
+
 const fadeIn = keyframes({
   from: { opacity: 0 },
   to: { opacity: 1 },
@@ -25,6 +83,10 @@ const HeroWrapper = styled('section', {
     height: '60vh',
     minHeight: '500px',
   },
+
+  '&[data-debug="true"]': {
+    cursor: 'crosshair',
+  },
 });
 
 const HeroImageWrapper = styled('div', {
@@ -32,12 +94,72 @@ const HeroImageWrapper = styled('div', {
   inset: '-15%', // Extra space for parallax movement
   zIndex: 0,
   willChange: 'transform',
+
+  // Responsive focal point using CSS custom properties
+  '& img': {
+    objectFit: 'cover',
+    objectPosition: 'var(--focal-x-default, 50%) var(--focal-y-default, 50%)',
+  },
+
+  '@bp2': {
+    '& img': {
+      objectPosition:
+        'var(--focal-x-bp2, var(--focal-x-default, 50%)) var(--focal-y-bp2, var(--focal-y-default, 50%))',
+    },
+  },
+
+  '@bp3': {
+    '& img': {
+      objectPosition:
+        'var(--focal-x-bp3, var(--focal-x-bp2, var(--focal-x-default, 50%))) var(--focal-y-bp3, var(--focal-y-bp2, var(--focal-y-default, 50%)))',
+    },
+  },
+});
+
+const DebugOverlay = styled('div', {
+  position: 'absolute',
+  inset: 0,
+  zIndex: 1,
+  pointerEvents: 'none',
+});
+
+const DebugCrosshair = styled('div', {
+  position: 'absolute',
+  width: '16px',
+  height: '16px',
+  borderRadius: '9999px',
+  border: '2px solid rgba(0, 229, 255, 0.95)',
+  transform: 'translate(-50%, -50%)',
+  boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.35)',
+
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    left: '50%',
+    top: '-10px',
+    width: '2px',
+    height: '36px',
+    background: 'rgba(0, 229, 255, 0.9)',
+    transform: 'translateX(-50%)',
+  },
+
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    left: '-10px',
+    top: '50%',
+    width: '36px',
+    height: '2px',
+    background: 'rgba(0, 229, 255, 0.9)',
+    transform: 'translateY(-50%)',
+  },
 });
 
 const HeroOverlay = styled('div', {
   position: 'absolute',
   inset: 0,
   zIndex: 1,
+  pointerEvents: 'none',
 
   // Default gradient (text on right)
   background:
@@ -157,9 +279,50 @@ export interface HeroSectionProps {
   subtitle?: string;
   tagline?: string;
   imagePosition?: 'center' | 'left' | 'right' | 'top' | 'bottom';
-  focalPoint?: { x: number; y: number }; // Percentage-based (0-100) for precise positioning
+  focalPoint?: FocalPointProp; // Percentage-based (0-100), supports responsive values
   textAlign?: 'left' | 'right' | 'center';
   priority?: boolean;
+}
+
+// Helper to get CSS custom properties for responsive focal points
+function getFocalPointStyles(
+  focalPoint?: FocalPointProp,
+  imagePosition: string = 'center'
+): React.CSSProperties {
+  // No focalPoint - use imagePosition fallback
+  if (!focalPoint) {
+    const pos = getFallbackFocalPoint(imagePosition);
+    return {
+      '--focal-x-default': `${pos.x}%`,
+      '--focal-y-default': `${pos.y}%`,
+    } as React.CSSProperties;
+  }
+
+  // Simple focal point (backward compatible)
+  if (!isResponsiveFocalPoint(focalPoint)) {
+    return {
+      '--focal-x-default': `${focalPoint.x}%`,
+      '--focal-y-default': `${focalPoint.y}%`,
+    } as React.CSSProperties;
+  }
+
+  // Responsive focal point
+  const styles: Record<string, string> = {
+    '--focal-x-default': `${focalPoint.default.x}%`,
+    '--focal-y-default': `${focalPoint.default.y}%`,
+  };
+
+  if (focalPoint.bp2) {
+    styles['--focal-x-bp2'] = `${focalPoint.bp2.x}%`;
+    styles['--focal-y-bp2'] = `${focalPoint.bp2.y}%`;
+  }
+
+  if (focalPoint.bp3) {
+    styles['--focal-x-bp3'] = `${focalPoint.bp3.x}%`;
+    styles['--focal-y-bp3'] = `${focalPoint.bp3.y}%`;
+  }
+
+  return styles as React.CSSProperties;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
@@ -174,8 +337,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   priority = true,
 }) => {
   const wrapperRef = useRef<HTMLElement>(null);
+  const imageWrapperRef = useRef<HTMLDivElement>(null);
   const [parallaxOffset, setParallaxOffset] = useState(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [debugEnabled, setDebugEnabled] = useState(false);
+  const [debugFocalPoint, setDebugFocalPoint] = useState<FocalPointValue | null>(null);
+  const [debugManualPoint, setDebugManualPoint] = useState(false);
 
   // Check for reduced motion preference and set up parallax
   useEffect(() => {
@@ -211,26 +378,87 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    setDebugEnabled(params.has('focal'));
+  }, []);
+
+  useEffect(() => {
+    if (!debugEnabled) {
+      setDebugFocalPoint(null);
+      setDebugManualPoint(false);
+      return;
+    }
+
+    const viewportWidth = window.innerWidth;
+    setDebugFocalPoint(getActiveFocalPoint(focalPoint, imagePosition, viewportWidth));
+    setDebugManualPoint(false);
+  }, [debugEnabled, focalPoint, imagePosition]);
+
+  useEffect(() => {
+    if (!debugEnabled) {
+      return;
+    }
+
+    const handleResize = () => {
+      if (debugManualPoint) {
+        return;
+      }
+
+      setDebugFocalPoint(getActiveFocalPoint(focalPoint, imagePosition, window.innerWidth));
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [debugEnabled, debugManualPoint, focalPoint, imagePosition]);
+
   // Map text alignment to gradient direction
   const gradientDirection =
     textAlign === 'left' ? 'left' : textAlign === 'center' ? 'center' : 'right';
 
-  // Determine object position: focalPoint takes precedence, then imagePosition
-  const objectPosition = focalPoint
-    ? `${focalPoint.x}% ${focalPoint.y}%`
-    : {
-        center: 'center center',
-        left: 'left center',
-        right: 'right center',
-        top: 'center top',
-        bottom: 'center bottom',
-      }[imagePosition];
+  // Get CSS custom properties for responsive focal point
+  const focalPointStyles = getFocalPointStyles(focalPoint, imagePosition);
+
+  const handleDebugClick = (event: React.MouseEvent<HTMLElement>) => {
+    if (!debugEnabled) {
+      return;
+    }
+
+    const rect = imageWrapperRef.current?.getBoundingClientRect();
+    if (!rect || !rect.width || !rect.height) {
+      return;
+    }
+
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    const nextPoint = {
+      x: Math.max(0, Math.min(100, Math.round(x * 10) / 10)),
+      y: Math.max(0, Math.min(100, Math.round(y * 10) / 10)),
+    };
+
+    setDebugFocalPoint(nextPoint);
+    setDebugManualPoint(true);
+    console.info('[HeroSection] focalPoint', nextPoint);
+  };
 
   return (
-    <HeroWrapper ref={wrapperRef}>
+    <HeroWrapper
+      ref={wrapperRef}
+      data-debug={debugEnabled ? 'true' : 'false'}
+      onClick={debugEnabled ? handleDebugClick : undefined}
+    >
       <HeroImageWrapper
+        ref={imageWrapperRef}
         style={{
           transform: prefersReducedMotion ? 'none' : `translateY(${parallaxOffset}px)`,
+          ...focalPointStyles,
         }}
       >
         <Image
@@ -240,11 +468,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           priority={priority}
           quality={85}
           sizes="100vw"
-          style={{
-            objectFit: 'cover',
-            objectPosition,
-          }}
         />
+        {debugEnabled && debugFocalPoint && (
+          <DebugOverlay aria-hidden="true">
+            <DebugCrosshair
+              style={{ left: `${debugFocalPoint.x}%`, top: `${debugFocalPoint.y}%` }}
+            />
+          </DebugOverlay>
+        )}
       </HeroImageWrapper>
 
       <HeroOverlay gradient={gradientDirection} />

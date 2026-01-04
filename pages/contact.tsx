@@ -5,6 +5,7 @@ import { HeroSection } from '@components/HeroSection';
 import { ContactForm } from '@components/ContactForm';
 import { styled } from 'stitches.config';
 import { siteConfig } from '@config/site';
+import { heroFocalPoints } from '@config/heroFocalPoints';
 
 const PageWrapper = styled('div', {
   minHeight: '100vh',
@@ -68,7 +69,7 @@ export default function ContactPage() {
         title="Contact"
         subtitle="I would love to hear from you. Whether you have a question about my research, a collaboration opportunity, or just want to say hello."
         tagline="Get in Touch"
-        imagePosition="center"
+        focalPoint={heroFocalPoints['/images/hero/hero-contact.jpg']}
         textAlign="left"
       />
 

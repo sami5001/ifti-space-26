@@ -10,6 +10,7 @@ import { ReaderIcon } from '@radix-ui/react-icons';
 import type { BlogPost } from '@lib/types';
 import { getAllPosts } from '@lib/posts';
 import { siteConfig } from '@config/site';
+import { heroFocalPoints } from '@config/heroFocalPoints';
 
 const PageWrapper = styled('div', {
   minHeight: '100vh',
@@ -118,7 +119,7 @@ export default function Blog({ posts }: { posts: BlogPost[] }) {
         title="Writing"
         subtitle="Thoughts on research, academia, and professional development."
         tagline="Personal Blog"
-        focalPoint={{ x: 50, y: 70 }}
+        focalPoint={heroFocalPoints['/images/hero/hero-writing.jpg']}
         textAlign="left"
       />
 

@@ -22,6 +22,7 @@ import { getResearchProjects } from '@lib/research';
 import { getPublications } from '@lib/publications';
 import { ResearchDetailModal } from '@components/ResearchDetailModal';
 import { siteConfig } from '@config/site';
+import { heroFocalPoints } from '@config/heroFocalPoints';
 import { getPersonProfile } from '@lib/person';
 import type { PersonProfile } from '@lib/types';
 
@@ -198,7 +199,7 @@ export default function Home({
         title={name}
         subtitle={tagline}
         tagline={profile?.institution || 'Academic Researcher'}
-        focalPoint={{ x: 50, y: 30 }}
+        focalPoint={heroFocalPoints['/images/hero/hero-home.jpg']}
         textAlign="left"
       />
 

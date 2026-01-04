@@ -7,15 +7,18 @@
 
 export const siteConfig = {
   // Basic site information
-  name: 'Your Name',
-  url: 'https://your-site.com',
-  description: 'Academic portfolio and research',
+  name: 'Hassan Saad Ifti',
+  url: 'https://ifti.space',
+  description: 'Aerospace researcher specializing in hypersonics, transpiration cooling, and high-speed aerothermodynamics at the University of Oxford.',
 
   // Navigation items (shown in header)
   navigation: [
     { label: 'Home', href: '/' },
+    { label: 'Bio', href: '/bio' },
     { label: 'Research', href: '/research' },
     { label: 'Publications', href: '/publications' },
+    { label: 'CV', href: '/cv' },
+    { label: 'Press', href: '/press' },
     { label: 'Writing', href: '/blog' },
     { label: 'Contact', href: '/contact' },
   ],
@@ -29,9 +32,9 @@ export const siteConfig = {
 
   // Social media links (leave empty to hide)
   social: {
-    linkedin: '',
+    linkedin: 'https://www.linkedin.com/in/hsi/',
     github: '',
-    twitter: '',
+    twitter: 'saadifti',
     googleScholar: '',
     researchGate: '',
     orcid: '',
@@ -47,9 +50,9 @@ export const siteConfig = {
 
   // SEO defaults
   seo: {
-    defaultTitle: 'Academic Portfolio',
-    titleTemplate: '%s | Your Name',
-    defaultDescription: 'Academic portfolio showcasing research, publications, and more.',
+    defaultTitle: 'Hassan Saad Ifti - Aerospace Researcher',
+    titleTemplate: '%s | Hassan Saad Ifti',
+    defaultDescription: 'DPhil candidate at the University of Oxford researching hypersonic vehicle cooling systems and high-speed aerothermodynamics.',
     defaultOgImage: '/images/og-default.png',
   },
 };

@@ -162,7 +162,11 @@ export default function PublicationsPage({ publications, talks, posters }: Publi
         title="Publications"
         subtitle="A collection of academic publications, conference presentations, and poster sessions."
         tagline="Academic Work"
-        imagePosition="center"
+        focalPoint={{
+          default: { x: 50, y: 45 },
+          bp2: { x: 50, y: 38 },
+          bp3: { x: 50, y: 30 },
+        }}
         textAlign="left"
       />
 
