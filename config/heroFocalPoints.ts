@@ -19,9 +19,9 @@ export const heroFocalPoints: Record<string, HeroFocalPoint> = {
     bp3: { x: 32, y: 34 },
   },
   '/images/hero/hero-press.jpg': {
-    default: { x: 50, y: 35 },
-    bp2: { x: 50, y: 32 },
-    bp3: { x: 50, y: 30 },
+    default: { x: 24, y: 18 },
+    bp2: { x: 24, y: 18 },
+    bp3: { x: 24, y: 18 },
   },
   '/images/hero/hero-research.jpg': {
     default: { x: 42, y: 55 },

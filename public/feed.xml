@@ -4,9 +4,9 @@
         <description><![CDATA[Academic portfolio and blog]]></description>
         <link>https://example.com</link>
         <generator>RSS for Node</generator>
-        <lastBuildDate>Sun, 04 Jan 2026 19:05:56 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 06 Jan 2026 23:02:44 GMT</lastBuildDate>
         <atom:link href="https://example.com/feed.xml" rel="self" type="application/rss+xml"/>
-        <pubDate>Sun, 04 Jan 2026 19:05:56 GMT</pubDate>
+        <pubDate>Tue, 06 Jan 2026 23:02:44 GMT</pubDate>
         <language><![CDATA[en]]></language>
         <item>
             <title><![CDATA[Welcome to My Research Blog]]></title>
